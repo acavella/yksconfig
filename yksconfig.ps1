@@ -1,15 +1,11 @@
 <#
 	.SYNOPSIS
-		 Disables inactive AD accounts
+		 Securely configures Yubikey
 	.DESCRIPTION
-		 Disables AD accounts that have been inactive for a specified period of time.
-	.PARAMETER Days
-		Specify the number of days an account has been inactive.
-	.INPUTS
-		Comma Seperated Values (CSV) containing account details.
-		Format:
-		username,firstname,lastname,password
-		<string>,<string>,<string>,<string>
+		 Uses secure settings and parameters to apply a default
+		 configuration to Yubikey 4/5.
+	.OUTPUTS
+		Text file containing configuration details.
 #>
 Param
 	(
@@ -37,7 +33,11 @@ $config_nfc=@{
 	OATH = "disable";
 	FIDO2 = "disable"
 }
-function LockConfig { # Set Configuration Lock Code
-$GenerateLockCode = (ykman.exe config set-lock-code -g -f)  | Out-String
-$LockCode = $GenerateLockCode.Split(': ',2)[-1]
+function Get-YKSerial {
+	$CMDYKSerial = (ykman.exe list) | Out-String
+	$YKSerial = $CMDYKSerial.Split(': ',2)[-1]
+}
+function Set-LockCode { # Set Configuration Lock Code
+$CMDLockCode = (ykman.exe config set-lock-code -g -f)  | Out-String
+$LockCode = $CMDLockCode.Split(': ',2)[-1]
 }
